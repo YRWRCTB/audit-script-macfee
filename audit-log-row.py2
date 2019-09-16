@@ -19,21 +19,21 @@ file_name_rotate="/var/lib/mysql/mysql-audit.json.1"
 def check_run():
 	#检测pid文件是否存在，存在函数返回为1
 	if os.path.exists(path+"/audit.pid"):
-		print("pid file exits.")
+		print "pid file exits."
 		return 1
 	#如果不存在在创建pid文件，并写入值,函数返回值为0
 	else:
 		create_pid = open(path+"/audit.pid","w")
 		create_pid.write(str(1))
 		create_pid.close()
-		print("pid file created.")
+		print "pid file created."
 		return 0
 
 #程序结束后删除pid文件
 def del_pid():
 	if os.path.exists(path+"/audit.pid"):
 		os.remove(path+"/audit.pid")
-		print("pid file removed.")
+		print "pid file removed."
 	##
 	else:
 		print("no pid file.")
@@ -45,13 +45,13 @@ path=sys.path[0]
 
 def check_files():
 	if os.path.exists(path+"/location.txt"):
-		print("location file exits")
+		print "location file exits"
 	else:
 		create_loc = open(path+"/location.txt","w")
 		create_loc.write(str(0))
 		create_loc.close()
 	if os.path.exists(path+"/check_time.txt"):
-		print("check_time files exists")
+		print "check_time files exists"
 	else:
 		create_time = open(path+"/check_time.txt","w")
 		create_time.write(str(0))
@@ -67,7 +67,7 @@ def read_file(file_name):
 	location_f = open(path+"/location.txt","r",encoding="utf-8")
 	location = location_f.readline()
 	location_f.close()
-	print ('rec loaction:',location)
+	print 'rec loaction:',location
 
 	location = int(location)
 	#创建游标
