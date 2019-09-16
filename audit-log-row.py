@@ -90,43 +90,82 @@ def read_file(file_name):
 			#使用占位符的方式进行SQL语句拼接,这种方式可以将
 			#line中的特殊符号进行转译，避免拼接时发生语法错误
 
+			#获取时间
+			date= int(json_obj["date"])/1000
+			date_time=datetime.datetime.fromtimestamp(date)
+			date_time=date_time.strftime("%Y-%m-%d %H:%M:%S.%f")
+
+			#获取Ip
+			try:
+				ip = (json_obj["ip"])
+			except:
+				ip = ''
+			else:
+				ip = json_obj["ip"]
+
+			#获取命令种类
+			try:
+				cmd = (json_obj["cmd"])
+			except:
+				cmd = ''
+			else:
+				cmd = json_obj["cmd"]
+
 			#根据字典的键取出值,数据库名，数据表名
 			try:
-#				print (json_obj["objects"][0])
 				null= (json_obj["objects"][0])
-#			print (type(json_obj["ip"]))
-#				print (type(json_obj["objects"][0]))
 			except:
 				db_name = ''
 				table_name = ''
 			else:
-#				db_table_name = str(json_obj["objects"][0])
-				#json_obj["objects"][0] 为字典类型
 				db_name = json_obj["objects"][0]['db']
 				table_name = json_obj["objects"][0]['name']
-				#table_name = 
 
-			#获取时间
-			date= int(json_obj["date"])/1000
-#			print("date",date)
-			date_time=datetime.datetime.fromtimestamp(date)
-			date_time=date_time.strftime("%Y-%m-%d %H:%M:%S.%f")
-#			print(date_time)		
-			#获取SQL语句影响行数
-			
+			#获取执行状态
 			try:
-#				print (json_obj["rows"])
+				status = (json_obj["status"])
+			except:
+				status = '0'
+			else:
+				status = int(json_obj["status"])
+
+
+			#获取用户名
+			try:
+				user = (json_obj["user"])
+			except:
+				user = ''
+			else:
+				user = json_obj["user"]
+
+
+			#获取SQL语句
+			try:
+				query = (json_obj["query"])
+			except:
+				query = ''
+			else:
+				query = json_obj["query"]
+
+			#获取SQL语句影响行数
+			try:
 				null= (json_obj["rows"])
-#			print (type(json_obj["ip"]))
-#				print (type(json_obj["rows"]))
 			except:
 				rows = '0'
 			else:
 				rows = int(json_obj["rows"])
 
-			cursor.execute(sql,(date_time,json_obj["ip"],json_obj["cmd"],\
-			db_name,table_name,json_obj["status"],json_obj["user"],\
-			json_obj["query"],rows,json_obj["thread-id"]))
+			#获取线程ID
+			try:
+				thread_id = (json_obj["thread-id"])
+			except:
+				thread_id = '0'
+			else:
+				thread_id = int(json_obj["thread-id"])
+
+			cursor.execute(sql,(date_time,ip,cmd,\
+			db_name,table_name,status,user,\
+			query,rows,thread_id))
 
 			cursor.execute("commit")
 		location = fd.tell()                            #记录最后一次读取文件的位置
