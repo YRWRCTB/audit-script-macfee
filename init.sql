@@ -9,6 +9,7 @@ CREATE TABLE `audit_row_web` (
   `sql_date_time` datetime(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000' COMMENT 'SQL执行时间',
   `ip` varchar(32) NOT NULL DEFAULT '0' COMMENT '用户ip',
   `thread_id` int(11) NOT NULL DEFAULT '0' COMMENT '线程id',
+  `query_id` int(11) NOT NULL DEFAULT '0' COMMENT '查询id',
   `cmd` varchar(16) NOT NULL COMMENT '命令类型',
   `db_name` varchar(32) NOT NULL DEFAULT '' COMMENT 'SQL作用的数据库',
   `table_name` varchar(32) NOT NULL DEFAULT '' COMMENT 'SQL作用的数据表名',
