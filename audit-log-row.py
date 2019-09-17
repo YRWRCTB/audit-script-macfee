@@ -84,8 +84,8 @@ def read_file(file_name):
 #			print(json_obj)
 			sql = "insert into audit_row_web(sql_date_time,ip, \
 				cmd,db_name,table_name,exe_status,user_name, \
-				sql_content,rows_affacted,thread_id) \
-				values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
+				sql_content,rows_affacted,thread_id,query_id) \
+				values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
 #			print (sql)
 			#使用占位符的方式进行SQL语句拼接,这种方式可以将
 			#line中的特殊符号进行转译，避免拼接时发生语法错误
@@ -163,9 +163,17 @@ def read_file(file_name):
 			else:
 				thread_id = int(json_obj["thread-id"])
 
+			#获取查询ID
+			try:
+				query_id = (json_obj["query-id"])
+			except:
+				query_id = '0'
+			else:
+				query_id = int(json_obj["query-id"])
+
 			cursor.execute(sql,(date_time,ip,cmd,\
 			db_name,table_name,status,user,\
-			query,rows,thread_id))
+			query,rows,thread_id,query_id))
 
 			cursor.execute("commit")
 		location = fd.tell()                            #记录最后一次读取文件的位置
