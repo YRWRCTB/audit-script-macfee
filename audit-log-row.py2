@@ -84,18 +84,37 @@ def read_file(file_name):
 #			print(json_obj)
 			sql = "insert into audit_row_web(sql_date_time,ip, \
 				cmd,db_name,table_name,exe_status,user_name, \
-				sql_content,rows_affacted,thread_id) \
-				values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
+				sql_content,rows_affacted,thread_id,query_id) \
+				values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
 #			print (sql)
 			#使用占位符的方式进行SQL语句拼接,这种方式可以将
 			#line中的特殊符号进行转译，避免拼接时发生语法错误
 
+			#获取时间
+			date= int(json_obj["date"])/1000
+			date_time=datetime.datetime.fromtimestamp(date)
+			date_time=date_time.strftime("%Y-%m-%d %H:%M:%S.%f")
+
+			#获取ip
+			try:
+				ip = (json_obj["ip"])
+			except:
+				ip = ''
+			else:
+				ip = (json_obj["ip"])
+
+
+			#获取命令种类
+			try:
+				cmd = (json_obj["cmd"])
+			except:
+				cmd = ''
+			else:
+				cmd = (json_obj["cmd"])
+
 			#根据字典的键取出值,数据库名，数据表名
 			try:
-#				print (json_obj["objects"][0])
 				null= (json_obj["objects"][0])
-#			print (type(json_obj["ip"]))
-#				print (type(json_obj["objects"][0]))
 			except:
 				db_name = ''
 				table_name = ''
@@ -104,29 +123,59 @@ def read_file(file_name):
 				#json_obj["objects"][0] 为字典类型
 				db_name = json_obj["objects"][0]['db']
 				table_name = json_obj["objects"][0]['name']
-				#table_name = 
 
-			#获取时间
-			date= int(json_obj["date"])/1000
-#			print("date",date)
-			date_time=datetime.datetime.fromtimestamp(date)
-			date_time=date_time.strftime("%Y-%m-%d %H:%M:%S.%f")
-#			print(date_time)		
-			#获取SQL语句影响行数
-			
+			#获取SQL语句最终执行状态
 			try:
-#				print (json_obj["rows"])
-				null= (json_obj["rows"])
-#			print (type(json_obj["ip"]))
-#				print (type(json_obj["rows"]))
+				status = int(json_obj["status"])
+			except:
+				status = '0'
+			else:
+				status = int(json_obj["status"])
+
+			#获取用户名
+			try:
+				user = (json_obj["user"])
+			except:
+				user = ''
+			else:
+				user = (json_obj["user"])
+
+			#获取完整SQL语句
+			try:
+				query = (json_obj["query"])
+			except:
+				query = ''
+			else:
+				query = (json_obj["query"])
+
+			#获取SQL语句影响行数
+			try:
+				null= int(json_obj["rows"])
 			except:
 				rows = '0'
 			else:
 				rows = int(json_obj["rows"])
 
-			cursor.execute(sql,(date_time,json_obj["ip"],json_obj["cmd"],\
-			db_name,table_name,json_obj["status"],json_obj["user"],\
-			json_obj["query"],rows,json_obj["thread-id"]))
+
+			#获取线程id
+			try:
+				thread_id = int(json_obj["thread-id"])
+			except:
+				thread_id = '0'
+			else:
+				thread_id = int(json_obj["thread_id"])
+
+			#获取查询id
+			try:
+				query_id = int(json_obj["query-id"])
+			except:
+				query_id = '0'
+			else:
+				query_id = int(json_obj["query_id"])
+
+			cursor.execute(sql,(date_time,ip,cmd,\
+			db_name,table_name,status,user,\
+			query,rows,thread-id))
 
 			cursor.execute("commit")
 		location = fd.tell()                            #记录最后一次读取文件的位置
@@ -135,7 +184,7 @@ def read_file(file_name):
 		#将记录写入文件
 		#在下次读取时获得增量，location变量为数值类型
 #		print (location)
-	print ("new location:",location) #可以打印
+	print "new location:",location #可以打印
 	#将location的值存储在文本文件中以便下次使用；
 	location_f = open(path+"/location.txt","w",encoding="utf-8")
 	location_f.write(str(location))   #无法再文本文件中存储数值类型，需将器转换成字符串类型
@@ -152,13 +201,13 @@ def read_file(file_name):
 #根据其变化进行不同操作，以便获取正确的日志内容
 
 def check_time():
-	print('script loaction :',path)
+	print 'script loaction :',path
 	#检测"/var/lib/mysql/mysql-audit.json.1"最后修改时间
 	json_time_now=os.path.getmtime(file_name_rotate)
 	#将值转换为int
 	json_time_now=int(json_time_now)
 
-	print("audit log modify time now",json_time_now)
+	print "audit log modify time now",json_time_now
 
 	#读取check_time.txt文件中的内容，文件中初始值为0
 	time_rec = open(path+"/check_time.txt","r",encoding="utf-8")
@@ -167,7 +216,7 @@ def check_time():
 
 #	print("rec",json_time_rec)
 	json_time_rec=int(json_time_rec)
-	print("audit log modify time rec",json_time_rec)
+	print "audit log modify time rec",json_time_rec
 
 	#将本次解析文件时间存储在check_time.txt中，默认格式为小数点后四位；
 	#将其转换为int，并按照字符串存储在文件中,用于下次比较
@@ -185,13 +234,13 @@ def check_time():
 #根据记录时间的不同，分别执行不同函数
 #第一次执行前check_time.txt将中内容置为0，将会直接执行如下函数
 def main():
-	print("start analysing audit log ....")	
-	print (time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())))
+	print "start analysing audit log ...."
+	print time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
 	#检测pid文件是否存在
 	run = check_run()
 	#若果存在，则退出程序
 	if run == 1:
-		print("programe is running! exit")
+		print "programe is running! exit"
 
 	#若果不存在，则执行读取文件，写入数据库操作
 	else:
@@ -204,14 +253,14 @@ def main():
 	
 		if status == -1:
 			read_file(file_name)
-			print("first time auditing",0)
+			print "first time auditing",0
 
 		#之后执行时，将比较记录时间和当前时间
 		#如果时间相同，表明没有进行日志的轮换
 		#可以相关参数不改变，可以继续执行
 		elif status == 1:
 			read_file(file_name)
-			print("audit log file was not changed.")
+			print "audit log file was not changed."
 
 		#如果发生日志切换
 		else:
@@ -224,15 +273,15 @@ def main():
 			location_f.close()
 	
 			read_file(file_name)
-			print("audit log was rotated.")
+			print "audit log was rotated."
 		#关闭连接
 		db.close()
 	#删除pid文件
 	del_pid()
 	#打印当前时间
 #	print (time.localtime(time.time()))
-	print('analyzing audit log ended .')
-	print (time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())))
+	print 'analyzing audit log ended .'
+	print time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
 if __name__ == '__main__':
 	main()
 

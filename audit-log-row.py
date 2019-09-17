@@ -123,7 +123,7 @@ def read_file(file_name):
 
 			#获取执行状态
 			try:
-				status = (json_obj["status"])
+				status = int(json_obj["status"])
 			except:
 				status = '0'
 			else:
@@ -149,7 +149,7 @@ def read_file(file_name):
 
 			#获取SQL语句影响行数
 			try:
-				null= (json_obj["rows"])
+				null= int(json_obj["rows"])
 			except:
 				rows = '0'
 			else:
@@ -157,7 +157,7 @@ def read_file(file_name):
 
 			#获取线程ID
 			try:
-				thread_id = (json_obj["thread-id"])
+				thread_id = int(json_obj["thread-id"])
 			except:
 				thread_id = '0'
 			else:
@@ -165,7 +165,7 @@ def read_file(file_name):
 
 			#获取查询ID
 			try:
-				query_id = (json_obj["query-id"])
+				query_id = int(json_obj["query-id"])
 			except:
 				query_id = '0'
 			else:
