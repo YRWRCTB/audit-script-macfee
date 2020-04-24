@@ -59,7 +59,7 @@ def check_files():
 	
 
 #远程数据库连接
-db = mysqldb.connect(host="172.16.0.230",user="root",password="easytech",database="tian",charset="utf8")
+db = mysqldb.connect(host="172.16.0.230",user="root",password="xxx",database="xxxx",charset="utf8")
 
 
 def read_file(file_name):
